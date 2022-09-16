@@ -191,10 +191,12 @@ const addProductToCart = () => {
                     if (local[i].quantity >= 100) {
                         console.log("empecher l'ajout d'article identique >100");
                         alert("Vous ne pouvez pas choisir plus de 100 articles pour ce produit")
-
+                        local[i].quantity += parseInt(quantity.value) <= 100
                         return (
-                            local[i].quantity == NaN
+                            local[i].quantity == NaN,
+                            local[i].quantity += parseInt(quantity.value) = NaN
                         )
+                        
 
                     };
 
@@ -204,12 +206,14 @@ const addProductToCart = () => {
                         local[i].quantity += parseInt(quantity.value),
                         //parseInt permet de récupérer la quantité de l'input
                         console.log("quantité choise ajoutée"),
+                        
                         alert("La quantité a bien été ajouté au panier"),
+
                         localStorage.setItem("product", JSON.stringify(local)),
                         //enregistrement dans le localStorage
                         (local = JSON.parse(localStorage.getItem("product")))
-                        
 
+                        
                     );
 
 
@@ -227,7 +231,7 @@ const addProductToCart = () => {
                     //id diff ou couleur diff
                     || ((local[i]).id != singleProduct._id)
                 )
-
+                
                 //on récupère la réponse retournée par la condition et 
                 //on ajoute le nouveau produit dans le tableau
                 {
