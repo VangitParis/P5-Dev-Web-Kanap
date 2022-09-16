@@ -1,13 +1,15 @@
+/////----------REQUETER API POUR RECUPERER LES ID DES PRODUITS INDIVUDELLEMENT------//////////
 
 
 //requeter l'api qui doit être personnalisée
 const idUrl = new URL(window.location).searchParams.get('id');
 const url = 'http://localhost:3000/api/products/' + idUrl;
 
+//récupérer le localStorage 
 let product = JSON.parse(localStorage.getItem("product"));
 //console.log(product);
 
-
+//Créer un Tableau vide pour y mettre 
 let singleProduct = [];
 //console.log(singleProduct);
 
@@ -18,7 +20,9 @@ fetch("http://localhost:3000/api/products/" + idUrl)
     //réponse pour chaque produit dans le tableau créé à partir de json
     .then((promise) => {
         singleProduct = promise;
-        //console.log(singleProduct);
+        //singleProduct.price = data.price;
+        //console.log(singleProduct._id);
+
 
         const kanapChoice = singleProduct;
         //console.log(kanapChoice);
@@ -31,7 +35,7 @@ fetch("http://localhost:3000/api/products/" + idUrl)
         let p = document.querySelector("#description");
 
         //Récupération de l'élément du DOM qui accueillera l'image 
-        let img_item = document.getElementsByClassName("item__img");
+        //let img_item = document.getElementsByClassName("item__img");
         //console.log(img_item);
         //image du produit
         let imgKanapChoice = document.createElement("img");
@@ -50,6 +54,7 @@ fetch("http://localhost:3000/api/products/" + idUrl)
         priceKanapchoice.textContent = kanapChoice.price;
         price.appendChild(priceKanapchoice);
         //console.log(priceKanapchoice);
+
 
 
         // description du kanap
@@ -88,10 +93,8 @@ fetch("http://localhost:3000/api/products/" + idUrl)
             colors.appendChild(optionColorsKanapChoice);
 
 
+        };
 
-
-
-        }
         addProductToCart(singleProduct);
     });
 
@@ -102,57 +105,61 @@ const addProductToCart = () => {
     let btnAddToCart = document.getElementById("addToCart");
     //console.log(btnAddToCart);
 
-
-    //ajout d'un suivi au click du bouton
+    //ajout d'un suivi au click du bouton Ajouter au panier
     btnAddToCart.addEventListener("click", () => {
+
 
         //produits enregistrés dans le localstorage sous forme de tableau
         let local = JSON.parse(localStorage.getItem("product"));
-        //console.log(local)//null
+        console.log(local)//null
 
 
-
-
+        localStorage.setItem("product", JSON.stringify(local));
         //fonction pour assigner les détails du produit (id, quantité, et couleur)  
-        let product = {
+        let productDetails = {
             id: `${singleProduct._id}`,
             color: `${colors.value}`,
             quantity: parseInt(quantity.value),
             imageUrl: `${singleProduct.imageUrl}`,
             altTxt: `${singleProduct.altTxt}`,
-            description: `${singleProduct.description}`,
             nom: `${singleProduct.name}`,
-            price: `${singleProduct.price}`
         };
+        console.log(`${colors.value}`);
 
-        console.log(product.price)
         //Fonction : ajouter un produit dans le localstorage
-        const ajouterProduit = () => {
+        function ajouterProduit() {
             //.push pour ajouter le produit dans le tableau vide
-            local.push(product);
+            local.push(productDetails);
             localStorage.setItem("product", JSON.stringify(local));
-
+            (local = JSON.parse(localStorage.getItem("product")))
+        }
+        //Attention particulière à la non saisie des couleurs
+        //Si l'utilisateur ne choisit pas de couleurs
+        if (colors.value == 0) {
+            console.log(colors.value);
+            alert(" Merci de sélectionner une couleur")
+            return (
+                colors.value == NaN
+            )
         };
 
         //Attention particulière à la saisie des quantités dans la page produit
-
         //Si l'utilisateur saisi 0 ou moins (valeurs négatives)
         if (quantity.value < 1) {
-            alert(" merci de sélectionner une quantité minimum de 1")
+            alert(" Merci de sélectionner une quantité minimum de 1")
             quantity.value = 1;
             return (
                 quantity.value == NaN
             )
             //Si l'utilisateur saisi plus de 100 articles
         } else if (quantity.value > 100) {
-            alert("vous ne pouvez pas choisir plus de 100 articles pour ce produit")
+            alert("Vous ne pouvez pas choisir plus de 100 articles pour ce produit")
             quantity.value = 100
-
             return (
                 quantity.value == NaN
             )
-
         };
+
 
 
         //Lorsqu’on ajoute un produit au panier, si celui-ci n'était pas déjà
@@ -164,8 +171,8 @@ const addProductToCart = () => {
             local = [];
             //on injecte le produit et on enregistre dans le localstorage
             ajouterProduit();
-            console.log(local);
-
+            alert("Le produit a été ajouté au panier");
+            //console.log(local);
 
             //Lorsqu’on ajoute un produit au panier, si celui-ci était déjà présent
             //dans le panier (même id + même couleur), on incrémente
@@ -181,24 +188,27 @@ const addProductToCart = () => {
                 if (((local[i]).id == singleProduct._id) && (local[i].color == colors.value)) {
                     //console.log((local[i]).id); 
                     //éviter la redondance du panier pour une quantité supérieure à 100 pour le même produit
-                    if (local[i].quantity >=100) {
+                    if (local[i].quantity >= 100) {
                         console.log("empecher l'ajout d'article identique >100");
-                        alert("vous ne pouvez pas choisir plus de 100 articles pour ce produit")
-                    
+                        alert("Vous ne pouvez pas choisir plus de 100 articles pour ce produit")
+
                         return (
                             local[i].quantity == NaN
                         )
+
                     };
+
                     //on récupère la réponse retournée par la condition et on ajoute 
                     //la quantité choise si le produit est déjà présent
                     return (
                         local[i].quantity += parseInt(quantity.value),
                         //parseInt permet de récupérer la quantité de l'input
                         console.log("quantité choise ajoutée"),
+                        alert("La quantité a bien été ajouté au panier"),
                         localStorage.setItem("product", JSON.stringify(local)),
                         //enregistrement dans le localStorage
                         (local = JSON.parse(localStorage.getItem("product")))
-                        //location.reload()
+                        
 
                     );
 
@@ -224,6 +234,8 @@ const addProductToCart = () => {
                     return (
                         console.log("nouveauproduitinjecté"),
                         ajouterProduit(),
+                        alert("Le produit a été ajouté au panier"),
+                        alert("Retrouvez votre commande dans le panier"),
                         //enregistrement dans le localStorage
                         local = JSON.parse(localStorage.getItem("product")),
                         location.reload()
