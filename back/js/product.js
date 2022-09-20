@@ -6,7 +6,7 @@ const idUrl = new URL(window.location).searchParams.get('id');
 const url = 'http://localhost:3000/api/products/' + idUrl;
 
 //récupérer le localStorage 
-let product = JSON.parse(localStorage.getItem("product"));
+//let product = JSON.parse(localStorage.getItem("product"));
 //console.log(product);
 
 //Créer un Tableau vide pour y mettre 
@@ -111,7 +111,7 @@ const addProductToCart = () => {
 
         //produits enregistrés dans le localstorage sous forme de tableau
         let local = JSON.parse(localStorage.getItem("product"));
-        console.log(local)//null
+        //console.log(local)//null
 
 
         localStorage.setItem("product", JSON.stringify(local));
@@ -133,34 +133,86 @@ const addProductToCart = () => {
             localStorage.setItem("product", JSON.stringify(local));
             (local = JSON.parse(localStorage.getItem("product")))
         }
+
         //Attention particulière à la non saisie des couleurs
         //Si l'utilisateur ne choisit pas de couleurs
         if (colors.value == 0) {
             console.log(colors.value);
-            alert(" Merci de sélectionner une couleur")
+            //création d'une div pour envoyer un message html en cas de non-choix de la couleur
+            let requiredColors = document.createElement("div")
+            let divColors = document.querySelector(".item__content__settings__color")
+            requiredColors.setAttribute("id", "texte")
+            requiredColors.setAttribute("style", "color:#fbbcbc")
+            divColors.appendChild(requiredColors);
+            //msg si l'utilisateur ne choisit pas de couleurs
+            requiredColors.textContent = ("Merci de sélectionner une couleur")
+
+            //fonction effacer les div suivantes avec display
+            function removeDivs() {
+                divMsg = document.getElementById('texte');
+
+                if (requiredColors.style.display == 'block') {
+                    requiredColors.style.display = 'none'
+
+                }
+                else
+                    requiredColors.style.display = 'block';
+
+            }
+            removeDivs();
+            //delai pour que le message disparaisse
+            setTimeout((removeDivs), 2000)
+            //console.log(divMsg);
+            
             return (
                 colors.value == NaN
             )
+
+
         };
 
         //Attention particulière à la saisie des quantités dans la page produit
+        let requiredQuantity = document.createElement("div");
+        let divMinQuantity = document.querySelector(".item__content__settings__quantity");
+        requiredQuantity.setAttribute("id", "texte");
+        requiredQuantity.setAttribute("style", "color:#fbbcbc");
+        divMinQuantity.appendChild(requiredQuantity);
+
+        //fonction effacer les div suivantes avec display
+        function removeDivs() {
+
+            if (requiredQuantity.style.display == 'block') {
+                requiredQuantity.style.display = 'none'
+
+            }
+            else
+                requiredQuantity.style.display = 'block';
+
+        }
+        removeDivs();
+        //delai pour que le message disparaisse
+        setTimeout((removeDivs), 2000)
+
         //Si l'utilisateur saisi 0 ou moins (valeurs négatives)
         if (quantity.value < 1) {
-            alert(" Merci de sélectionner une quantité minimum de 1")
+            //msg si l'utilisateur choisit une quantité < 1
+            requiredQuantity.textContent = ("Merci de sélectionner une quantité minimum de 1")
             quantity.value = 1;
             return (
                 quantity.value == NaN
             )
+
             //Si l'utilisateur saisi plus de 100 articles
         } else if (quantity.value > 100) {
-            alert("Vous ne pouvez pas choisir plus de 100 articles pour ce produit")
+            requiredQuantity.textContent = ("Vous ne pouvez pas choisir plus de 100 articles pour ce produit")
+            //alert("Vous ne pouvez pas choisir plus de 100 articles pour ce produit")
             quantity.value = 100
+
             return (
                 quantity.value == NaN
             )
+
         };
-
-
 
         //Lorsqu’on ajoute un produit au panier, si celui-ci n'était pas déjà
         //présent dans le panier, on ajoute un nouvel élément dans l’array.
@@ -189,16 +241,23 @@ const addProductToCart = () => {
                     //console.log((local[i]).id); 
                     //éviter la redondance du panier pour une quantité supérieure à 100 pour le même produit
                     if (local[i].quantity >= 100) {
-                        console.log("empecher l'ajout d'article identique >100");
-                        alert("Vous ne pouvez pas choisir plus de 100 articles pour ce produit")
-                    } else if (local[i].quantity + parseInt(quantity.value) >= 100) {
-                        alert(" Attention, la quantité maximale pour ce produit a été atteinte")
+                        requiredQuantity.textContent = ("Attention, la quantité maximale pour ce produit a été atteinte")
 
                         return (
                             local[i].quantity == NaN
                             //local[i].quantity += parseInt(quantity.value) == NaN
                         )
 
+
+                        //Si la quantité totale dépasse 100 ne pas ajouter le produit
+                    } else if (local[i].quantity + parseInt(quantity.value) >= 100) {
+
+                        requiredQuantity.textContent = ("Attention, la quantité maximale pour ce produit a été atteinte")
+
+                        return (
+                            local[i].quantity == NaN
+                            //local[i].quantity += parseInt(quantity.value) == NaN
+                        )
 
                     };
 
@@ -241,10 +300,9 @@ const addProductToCart = () => {
                         console.log("nouveauproduitinjecté"),
                         ajouterProduit(),
                         alert("Ajouté au panier"),
-                        alert("Retrouvez votre commande dans le panier"),
                         //enregistrement dans le localStorage
-                        local = JSON.parse(localStorage.getItem("product")),
-                        location.reload()
+                        local = JSON.parse(localStorage.getItem("product"))
+                        //location.reload()
                     );
                 }
             }

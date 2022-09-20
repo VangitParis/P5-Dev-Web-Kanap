@@ -13,7 +13,6 @@ const confirmationCommande = new URL(window.location).searchParams.get('id');
  //console.log(numOrder);
    
  
- //Effacer le localStorage
- localStorage.removeItem("commandeUser");
+
    
 

@@ -1,24 +1,15 @@
 
-//--L.11 -> L.84-// RECUPERER LOCALSTORAGE AVEC LES QUANTITES, INTEGRER LES ELEMENTS DANS LE DOM, 
-//--L.88 -> L.97-// RECUPERER LE PRIX PAR SON ID, 
-//-L.160 -> L.281-/ ECOUTER LES MODIFS DES QUANTITE , LA SUPPRESSION,
-//-L338 ->  L.393-/ FAIRE LE TOTAL DES QUANTITES, FAIRE LE TOTALPRIX DE LA COMMANDE, 
-//-L.395 -> L.643-/ RECUPERER LES DONNEES DU FORMULAIRE ET FAIRE LA VALIDATION GRACE AU REGEX,
-//-L.646 -> L.729-/ AJOUTER DES ALERTES SI ERREURS, ON STOCKE LES DONNEES DU FORM POUR API, 
-//-L.727 -> L.749-/ ON FAIT API POST,
-//-L.768 et L.773// ON EFFACE LE PANIER DU LOCALSTORAGE, ON INJECTE L' ID DE LA COMMANDE DANS L' URL
-////-L.777---////// ON EFFACE LE FORMULAIRE DE LA PAGE PANIER
-
-
 //Appel du tableau contenu dans le localStorage 
 let local = JSON.parse(localStorage.getItem("product"));
 console.log(local);
 
-let confirmCommande = JSON.parse(localStorage.getItem("commandeUser"));
+//Variables qui vont être utilisées en dehors des fonctions
+
 
 let totalP = document.querySelector("#totalPrice");
 
 let responseByServer;
+
 
 //Fonction pour sauvegarder le localStorage 
 function saveLocalStorage() {
@@ -161,7 +152,6 @@ cart();
 
 ////////////////---------CIBLER UN ARTICLE DU PANIER ET ECOUTER LES MODIF----------///////////////////
 
-
 // addProduCt récupère le tableau 'product' qui est dans le localstorage
 let addProduct = JSON.parse(localStorage.getItem("product"));
 console.log(addProduct);
@@ -193,14 +183,15 @@ const getLocalForInput = async (local) => {
 
             ///////////////--------Eviter les donnees eronnées envoyées par l'utilisateur-------------/////////
 
-
             //Attention particulière à la saisie des quantités dans la page panier
 
             //Si l'utilisateur saisi 0 ou moins (valeurs négatives)
             if (value.textContent < 1) {
+
                 console.log(value.textContent);
                 alert(" merci de sélectionner une quantité minimum de 1")
 
+                //console.log(requiredQuantity);
                 //si utilisateur met une valeur <1, on revient à la quantité précedente sauvegardée
                 return (
                     value.textContent == NaN,
@@ -210,8 +201,8 @@ const getLocalForInput = async (local) => {
                 )
                 //Si l'utilisateur saisi plus de 100 articles
             } else if (value.textContent > 100) {
-                alert("vous ne pouvez pas choisir plus de 100 articles pour ce produit")
 
+                alert("vous ne pouvez pas choisir plus de 100 articles pour ce produit")
                 //si utilisateur met une valeur >100, on revient à la quantité précedente sauvegardée
                 return (
                     value.textContent == NaN,
@@ -241,7 +232,7 @@ const getLocalForInput = async (local) => {
                         //on récupère la fonction de calculs produits pour 
                         //charger les quantités et prix dynamiquement, On enregistre qtés saisies dans les qtés contenues dans panier existant
                         calculProduct()
-                    
+
                 }
 
                 //si l'utilisateur modifie la quantité d'un produit 
@@ -307,12 +298,17 @@ const removeQuantite = async (local) => {
             //console.log(productInCart);
 
             //si le panier ne contient qu'un seul article, alors efface le panier 
+
             if (totalAddProduct == 1) {
                 return (
                     localStorage.removeItem("product"),
+                    //alert("Produit supprimé du panier"),
+                    calculProduct(),
                     location.reload(),
+                    //alert("Le panier est vide"),
                     console.log("panier supprimé")
                 )
+
                 // s'il reste des produits dans le panier et qu'is sont diff renvoi moi le panier      
             } else {
                 //récupérer le nombre d'artciles restants dans le panier
@@ -328,7 +324,9 @@ const removeQuantite = async (local) => {
             //Enregistrement du nouveau panier 
             //console.log(productInCartAfterDelete);
             localStorage.setItem("product", JSON.stringify(productInCartAfterDelete));
-            location.reload();
+            //alert("Produit supprimé du panier")
+            calculProduct(),
+                location.reload();
             console.log("produit supprimé");
 
         })
@@ -427,7 +425,7 @@ prenom.addEventListener("input", function (e) {
         console.log(textPrenom);
 
 
-    }//vérifier que le prénom est bien compris entre 3 et 30 si ce n'est pas le cas => affiche l'erreur
+    }//vérifier que le prénom est bien compris entre 3 et 30 caractères si ce n'est pas le cas => affiche l'erreur
     else if (e.target.value.length < 3 || e.target.value.length > 30) {
         errorPrenom.innerHTML = "Saisir un prénom entre 3 et 30 caractères";
         //renvoyer une valeur null pour ne pas valider le champ
@@ -435,11 +433,9 @@ prenom.addEventListener("input", function (e) {
         console.log("erreur dans le champ prénom = trop court ou trop long");
     }
     //si le champ n'est pas vide on vérifie qu'il est valide avec les Regex MAJ, 
-    //min et compris entre 3 et 30 caractères, sont acceptés les -,. et ' ; 
+    //min et compris entre 3 et 30 caractères, sont acceptés les -, et ' ; 
     //les autres caractères sont exclus : chiffres symboles etc
     if (e.target.value.match(/^[a-z A-Z 'éèëç-]{3,30}$/)) {
-        //on déclare la constante errorPrenom et on la récupère dans le dom
-
         //string vide car pas d'erreurs pour cette condition
         errorPrenom.innerHTML = "";
         //cibler la valeur du champ
@@ -448,14 +444,14 @@ prenom.addEventListener("input", function (e) {
         console.log(textPrenom);
     }
     //vérifier les caractères spéciaux non compris dans la regex et envoyer 
-    //une erreur si ils sont bien dans l'intervalle 3,30 caractères et donc "match et != de e.target.value"
+    //une erreur si ils sont bien dans l'intervalle 0,30 caractères et donc "match et != de e.target.value"
     if (  //IMPORTANT !e
-        !e.target.value.match(/^[a-z A-Z 'éèëç-]{3,30}$/) &&
-        e.target.value.length > 3 &&
+        !e.target.value.match(/^[a-z A-Z 'éèëç-]{0,30}$/) &&
+        e.target.value.length > 0 &&
         e.target.value.length < 30)
     //On envoie l'erreur au cas où des chiffres ou autres caractères spéciaux sont envoyés dans le champ
     {
-        errorPrenom.innerHTML = "Le prénom ne doit pas contenir de chiffres ou de caractères spéciaux "
+        errorPrenom.innerHTML = "Le Prénom ne doit pas contenir de chiffres ou de caractères spéciaux "
         textPrenom = null
         console.log("erreur dans le champ prénom = chiffres ou caract spec présents");
     }
@@ -500,14 +496,14 @@ nom.addEventListener("input", function (e) {
         console.log(textNom);
     }
     //vérifier les caractères spéciaux non compris dans la regex et envoyer 
-    //une erreur si ils sont bien dans l'intervalle 3,30 caractères et donc "match et != de e.target.value"
+    //une erreur si ils sont bien dans l'intervalle 0,30 caractères et donc "match et != de e.target.value"
     if (  //IMPORTANT !e
-        !e.target.value.match(/^[a-z A-Z 'éèëç-]{2,30}$/) &&
-        e.target.value.length > 2 &&
+        !e.target.value.match(/^[a-z A-Z 'éèëç-]{0,30}$/) &&
+        e.target.value.length > 0 &&
         e.target.value.length < 30)
     //On envoie l'erreur au cas où des chiffres ou autres caractères spéciaux sont envoyés dans le champ
     {
-        errorNom.innerHTML = "Le nom ne doit pas contenir de chiffres ou de caractères spéciaux "
+        errorNom.innerHTML = "Le Nom ne doit pas contenir de chiffres ou de caractères spéciaux "
         textNom = null
         console.log("erreur dans le champ nom = chiffres ou caract spec présents");
     }
@@ -534,16 +530,16 @@ adresse.addEventListener("input", function (e) {
 
 
     }//vérifier que l'adresse est bien comprise entre 10 et 40 si ce n'est pas le cas => affiche l'erreur
-    else if (e.target.value.length < 10 || e.target.value.length > 40) {
-        errorAdresse.innerHTML = "Saisir une Adresse valide comprise entre 3 et 40 caractères";
+    else if (e.target.value.length < 5 || e.target.value.length > 40) {
+        errorAdresse.innerHTML = "Saisir une Adresse valide comprise entre 5 et 40 caractères";
         //renvoyer une valeur null pour ne pas valider le champ
         textAdresse = null;
         console.log("erreur dans le champ adresse = trop court ou trop long");
     }
     //si le champ n'est pas vide on vérifie qu'il est valide avec les Regex MAJ, 
-    //min et compris entre 10 et 40 caractères, sont acceptés les -,. et ' et les chiffres contenus entre 1 et 3 caract  ; 
+    //min et compris entre 0 et 40 caractères, sont acceptés les -,. et ' et les chiffres contenus entre 1 et 3 caract  ; 
     //les autres caractères sont exclus : symboles etc
-    if (e.target.value.match(/^[0-9]{1,3} [a-z A-Z 'éèëç-]{10,40}$/)) {
+    if (e.target.value.match(/^[0-9]{1,3} [a-z A-Z 'éèëç-]{5,40}$/)) {
         //string vide car pas d'erreurs pour cette condition
         errorAdresse.innerHTML = "";
         //cibler la valeur du champ
@@ -552,14 +548,14 @@ adresse.addEventListener("input", function (e) {
         console.log(textAdresse);
     }
     //vérifier les caractères spéciaux non compris dans la regex et envoyer 
-    //une erreur si ils sont bien dans l'intervalle 10,40 caractères et donc "match et != de e.target.value"
+    //une erreur si ils sont bien dans l'intervalle 0,40 caractères et donc "match et != de e.target.value"
     if (  //IMPORTANT !e
-        !e.target.value.match(/^[0-9]{1,3} [a-z A-Z 'éèëç-]{10,40}$/) &&
-        e.target.value.length > 10 &&
+        !e.target.value.match(/^[0-9]{1,3} [a-z A-Z 'éèëç-]{1,40}$/) &&
+        e.target.value.length > 1 &&
         e.target.value.length < 40)
     //On envoie l'erreur au cas où des chiffres ou autres caractères spéciaux sont envoyés dans le champ
     {
-        errorAdresse.innerHTML = "Saisir votre adresse en commençant par les numéros et ne doit pas contenir de caractères spéciaux"
+        errorAdresse.innerHTML = "L'adresse doit commencer par le Numéro et sans caractères spéciaux"
         textAdresse = null
         console.log("erreur dans le champ Adresse = chiffres ou caract spec présents");
     }
@@ -585,7 +581,7 @@ ville.addEventListener("input", function (e) {
 
     }//vérifier que la ville est bien comprise entre 3 et 30 si ce n'est pas le cas => affiche l'erreur
     else if (e.target.value.length < 3 || e.target.value.length > 30) {
-        errorVille.innerHTML = "Saisir un nom entre 3 et 30 caractères";
+        errorVille.innerHTML = "Saisir une ville entre 3 et 30 caractères";
         //renvoyer une valeur null pour ne pas valider le champ
         textVille = null;
         console.log("erreur dans le champ ville = trop court ou trop long");
@@ -604,8 +600,8 @@ ville.addEventListener("input", function (e) {
     //vérifier les caractères spéciaux non compris dans la regex et envoyer 
     //une erreur si ils sont bien dans l'intervalle 3,30 caractères et donc "match et != de e.target.value"
     if (  //IMPORTANT !e
-        !e.target.value.match(/^[a-z A-Z 'éèëç-]{3,30}$/) &&
-        e.target.value.length > 3 &&
+        !e.target.value.match(/^[a-z A-Z 'éèëç-]{0,30}$/) &&
+        e.target.value.length > 0 &&
         e.target.value.length < 30)
     //On envoie l'erreur au cas où des chiffres ou autres caractères spéciaux sont envoyés dans le champ
     {
@@ -627,7 +623,7 @@ email.addEventListener("input", (e) => {
         textEmail = null;
         console.log(textEmail);
 
-    }//utiliser une regex pour valider le champ email : mot . @ chiffres et . avec 2 ou 4 lettres après
+    }//utiliser une regex pour valider le champ email : mot . @ chiffres et . avec 2 ou 4 lettres avant et fr,com...
     else if (e.target.value.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
         errorEmail.innerHTML = "";
         textEmail = e.target.value;
@@ -636,7 +632,7 @@ email.addEventListener("input", (e) => {
     if (
         !e.target.value.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/) &&
         !e.target.value.length == 0) {
-        errorEmail.innerHTML = "Veuillez saisir une adresse E-mail correcte ex: marie@orange.fr";
+        errorEmail.innerHTML = "L'adresse E-mail saisie semble incorrecte. Aidez-vous de ce modèle : marie@orange.fr";
         textEmail = null;
         console.log("l'adresse email n'est pas correcte");
         console.log(textEmail);
@@ -667,9 +663,9 @@ form.addEventListener("submit", (e) => {
         textVille != null &&
         textAdresse != null) {
         console.log("Le formulaire est valide pour l'envoi ");
-        alert("La commande est validée")
+        //alert("La commande est validée")
 
-       
+
         //récupérer le panier enregistré dans le localstorage
         const validationCommande = JSON.parse(localStorage.getItem("product"));
 
@@ -692,21 +688,21 @@ form.addEventListener("submit", (e) => {
         });
         console.log(productID);
         //////---------info back-end conntroller/product.js à recopier pour l'utiliser-----------////////////
-                          /**
-                             *
-                             * Expects request to contain:
-                             * contact: {
-                             *   firstName: string,
-                             *   lastName: string,
-                             *   address: string,
-                             *   city: string,
-                             *   email: string
-                             * }
-                             * products: [string] <-- array of product _id
-                             *
-                             */
-         ///////////----------------------------------------------------------------------------//////////
-        
+        /**
+           *
+           * Expects request to contain:
+           * contact: {
+           *   firstName: string,
+           *   lastName: string,
+           *   address: string,
+           *   city: string,
+           *   email: string
+           * }
+           * products: [string] <-- array of product _id
+           *
+           */
+        ///////////----------------------------------------------------------------------------//////////
+
         //stocker le formulaire et les données enregistrees pour l'envoyer à l'API 
         const données = {
             //objet contact contenant les données
@@ -727,7 +723,7 @@ form.addEventListener("submit", (e) => {
 
         //////////////////----------------REQUETE POST API---------------/////////////////
 
-//route trouvée dans le back-end = router.post('/order', productCtrl.orderProducts) pour la requête post
+        //route trouvée dans le back-end = router.post('/order', productCtrl.orderProducts) pour la requête post
 
 
         //fetch API avec l'adresse des produits et ajouter '/order'
@@ -748,22 +744,6 @@ form.addEventListener("submit", (e) => {
                 //récupérer les données de la commande avec  order à l'intérieur de la réponse du serveur
                 //const donnéesContact = responseByServer.contact;
                 const orderId = responseByServer.orderId;
-
-            /*    //si il n'y a pas de commande déjà enregistrée dans localStorage (variable confirmCommande parsée plus haut)
-                if (confirmCommande == null) {
-                    confirmCommande = []
-                    confirmCommande.push(donnéesContact);
-                    console.log(confirmCommande);
-                    localStorage.setItem("commandeUser", JSON.stringify(confirmCommande));
-                }
-                // si la commande existe dejà dans le localStorage on push la dernière commande
-                else if (confirmCommande != null) {
-                    confirmCommande.push(donnéesContact);
-                    localStorage.setItem("commandeUser", JSON.stringify(confirmCommande));
-                }
-                console.log(confirmCommande);*/
-
-
 
                 //supprimer le panier des produits du localStorage après avoir passé la commande
                 localStorage.removeItem("product");
@@ -788,11 +768,11 @@ form.addEventListener("submit", (e) => {
         textEmail = null;
 
 
-    // Si le formulaire n'est pas rempli ou que une des valeurrs est null = alerte remplir le formulaire correctement
+        // Si le formulaire n'est pas rempli ou que une des valeurs est null = alerte remplir le formulaire correctement
     } else {
         alert("Le formulaire n'est pas rempli correctement");
+
     }
 
 })
-//appel de la fonction pour l'afficher
-console.log(confirmCommande)
+
